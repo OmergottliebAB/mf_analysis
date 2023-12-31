@@ -1,7 +1,5 @@
 import os
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 from visualisation import plot_tracklet_position, plot_kinematics
 
 
@@ -82,5 +80,19 @@ class Tracklet:
         else:
             self.is_occluded = np.full(len(self.df), np.nan)
 
-    def get_attribute(self, attribute):
-        return np.diff(getattr(self, attribute))
+    def longitudinal_velocity_sign_change(self):
+        flag = False
+        for i in range(len(self.abs_vel_z)-1):
+            curr_vel = self.abs_vel_z[i]
+            next_vel = self.abs_vel_z[i+1]
+            if self._sign_difference(curr_vel, next_vel) and abs(next_vel - curr_vel) > 1:
+                flag = True
+        return flag
+
+    @staticmethod
+    def _sign_difference(x, y):
+        if (x < 0 and y >= 0) or (x >= 0 and y < 0):
+            return True
+        else:
+            return False
+
