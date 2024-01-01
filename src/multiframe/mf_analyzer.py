@@ -7,17 +7,20 @@ from src.utils import setup_logger
 
 MF_LABELS = [0, 1, 2]
 
-logger = setup_logger(name='mf_analyser')
-
 
 class MFAnalyzer:
     def __init__(self, path):
         self.df = pd.read_csv(path, sep='\t')
         self.tracklets = MFParser(self.df).apply()
         self.output_dir(path)
+        self.set_logger()
 
     def __len__(self):
         return len(self.tracklets)
+
+    def set_logger(self):
+        path = os.path.join(self.output_dir,'log.log')
+        self.logger = setup_logger(path,name='mf_analyser')
 
     def output_dir(self, path):
         path = os.path.dirname(path)
@@ -64,6 +67,7 @@ class MFAnalyzer:
                 tracklet.save(tracklet_dir)
 
     def save_physical_anomalies(self):
+        self.logger.info('Anomaly detection according to unphysical changes')
         tracklets_dir = os.path.join(self.output_dir, 'physical_anomalies')
         os.makedirs(tracklets_dir, exist_ok=True)
         for label in MF_LABELS:

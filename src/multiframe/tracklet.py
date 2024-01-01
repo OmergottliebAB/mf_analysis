@@ -1,8 +1,9 @@
 import os
+import logging
 import numpy as np
 from visualisation import plot_tracklet_position, plot_kinematics
 
-
+logger: logging.Logger = logging.getLogger("mf_analyser")
 class Tracklet:
     def __init__(self, df):
         self.df = df
@@ -87,6 +88,7 @@ class Tracklet:
             next_vel = self.abs_vel_z[i+1]
             if self._sign_difference(curr_vel, next_vel) and abs(next_vel - curr_vel) > 1:
                 flag = True
+                logger.info(f'Occurance at {self.frames[i]}, label:{self.label} ; uid:{self.uid}')
         return flag
 
     @staticmethod
