@@ -1,7 +1,7 @@
 import os
 import logging
 import numpy as np
-from visualisation import plot_tracklet_position, plot_kinematics
+from visualisation import plot_tracklet_position, plot_kinematics, plot_bbox_params
 
 logger: logging.Logger = logging.getLogger("mf_analyser")
 class Tracklet:
@@ -45,13 +45,14 @@ class Tracklet:
 
     def save(self, path):
         os.makedirs(path, exist_ok=True)
-        tracklet_path = os.path.join(path, f'tracklet.tsv')
+        tracklet_path = os.path.join(path, f'tracklet_uid_{self.uid}.tsv')
         self.save_dataframe(tracklet_path)
         self.save_graphs(path)
 
     def save_graphs(self, path):
         plot_tracklet_position(self.lat_dist, self.long_dist, path)
         self._plot_kinematics(path)
+        self._plot_bbox_parameters(path)
 
     def _plot_kinematics(self, path):
         axis_dict = {'x_axis': {'lat_dist':  {'vector': self.lat_dist, 'units': 'm'},
@@ -67,6 +68,14 @@ class Tracklet:
         x = self.df['age'].to_numpy()
         file_path = os.path.join(path, 'kinematics.png')
         plot_kinematics(x, axis_dict, file_path)
+
+    def _plot_bbox_parameters(self, path):
+        params_dict = {'width':{'vector': self.width, 'units':'pixel'},
+                       'height':{'vector': self.height, 'units':'pixel'}}
+        x = self.df['age'].to_numpy()
+        file_path = os.path.join(path, 'bbox_params.png')
+        plot_bbox_params(x, params_dict, file_path)
+
 
     def save_dataframe(self, path):
         self.df = self.df.drop(['index'], axis=1)
@@ -88,7 +97,7 @@ class Tracklet:
             next_vel = self.abs_vel_z[i+1]
             if self._sign_difference(curr_vel, next_vel) and abs(next_vel - curr_vel) > 1:
                 flag = True
-                logger.info(f'Occurance at {self.frames[i]}, label:{self.label} ; uid:{self.uid}')
+                logger.info(f'Longitudinal velocity sign change at {self.frames[i]}, label:{self.label} ; uid:{self.uid}')
         return flag
 
     @staticmethod
