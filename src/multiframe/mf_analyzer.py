@@ -19,8 +19,8 @@ class MFAnalyzer:
         return len(self.tracklets)
 
     def set_logger(self):
-        path = os.path.join(self.output_dir,'log.log')
-        self.logger = setup_logger(path,name='mf_analyser')
+        path = os.path.join(self.output_dir, 'log.log')
+        self.logger = setup_logger(path, name='mf_analyser')
 
     def output_dir(self, path):
         path = os.path.dirname(path)
@@ -45,8 +45,8 @@ class MFAnalyzer:
         for tracklet in tracklets:
             if tracklet.age < age:
                 age = tracklet.age
-                longest_tracklet = tracklet
-        return longest_tracklet
+                shortest_tracklet = tracklet
+        return shortest_tracklet
 
     def get_tracklets_by_label(self, label):
         tracklets = []
@@ -56,6 +56,7 @@ class MFAnalyzer:
         return tracklets
 
     def save_tracklets(self):
+        self.logger.info('Saving tracklets')
         tracklets_dir = os.path.join(self.output_dir, 'tracklets')
         os.makedirs(tracklets_dir, exist_ok=True)
         for label in MF_LABELS:
@@ -81,7 +82,7 @@ class MFAnalyzer:
 
 
 if __name__ == "__main__":
-    path = '/home/omer/B2B/multiframe/unsupervised_analysis/stanch_las_cruces_10_fps__test/cametra_interface_output.tsv'
+    path = '/home/omer/B2B/multiframe/unsupervised_analysis/ultrasonic_texarkana_10_fps/cametra_interface_output.tsv'
     mfa = MFAnalyzer(path)
-    mfa.save_physical_anomalies()
+    mfa.save_tracklets()
     print('')

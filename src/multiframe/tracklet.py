@@ -70,8 +70,8 @@ class Tracklet:
         plot_kinematics(x, axis_dict, file_path)
 
     def _plot_bbox_parameters(self, path):
-        params_dict = {'width':{'vector': self.width, 'units':'pixel'},
-                       'height':{'vector': self.height, 'units':'pixel'}}
+        params_dict = {'world_width':{'vector': self.world_width, 'units':'m'},
+                       'world_height':{'vector': self.world_height, 'units':'m'}}
         x = self.df['age'].to_numpy()
         file_path = os.path.join(path, 'bbox_params.png')
         plot_bbox_params(x, params_dict, file_path)
