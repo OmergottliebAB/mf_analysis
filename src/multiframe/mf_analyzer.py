@@ -82,7 +82,7 @@ class MFAnalyzer:
 
 
 if __name__ == "__main__":
-    path = '/home/omer/B2B/multiframe/unsupervised_analysis/stanch_las_cruces_10_fps__test/cametra_interface_output.tsv'
+    path = '/home/omer/B2B/multiframe/unsupervised_analysis/ultrasonic_texarkana_10_fps/cametra_interface_output.tsv'
     mfa = MFAnalyzer(path)
     mfa.save_physical_anomalies()
     print('')

@@ -57,7 +57,7 @@ def plot_bbox_params(age, params_dict: dict, file_path):
 def plot_variable(ax, x, y, title, units):
     N = len(x)
     mean, std = np.mean(y), np.std(y)
-    ax.plot(x, y, label=title, color='blue')
+    ax.plot(x, y,'--bo', label=title)
     ax.plot(x, np.full(N, mean), label='mean', color='green')
     ax.plot(x, np.full(N, 2*std + mean), label=f'2*std',
             color='red', linestyle='dashed')

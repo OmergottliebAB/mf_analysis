@@ -106,7 +106,7 @@ class Tracklet:
         for i in range(idx,len(self.abs_vel_z)-1):
             curr_vel = self.abs_vel_z[i]
             next_vel = self.abs_vel_z[i+1]
-            if self._sign_difference(curr_vel, next_vel) and abs(next_vel - curr_vel) > 1:
+            if self._sign_difference(curr_vel, next_vel) and abs(next_vel - curr_vel) > 2:
                 flag = True
                 logger.info(f'Longitudinal velocity anomaly at frame: {self.frames[i+1]} for label:{self.label} ; uid:{self.uid}')
         return flag
