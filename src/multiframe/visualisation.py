@@ -42,6 +42,17 @@ def plot_kinematics(age, axis_dict: dict, file_path):
     plt.savefig(file_path)
     plt.close()
 
+def plot_bbox_params(age, params_dict: dict, file_path):
+    fig, ax = plt.subplots(2, 1, figsize=FIGSIZE)
+    for i,(key, values) in enumerate(params_dict.items()):
+        vec = values['vector']
+        units = values['units']
+        plot_variable(ax[i], age, vec, key, units)
+
+    plt.savefig(file_path)
+    plt.close()
+
+
 
 def plot_variable(ax, x, y, title, units):
     N = len(x)

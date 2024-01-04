@@ -1,10 +1,9 @@
 import os
+import logging
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from visualisation import plot_tracklet_position, plot_kinematics
+from visualisation import plot_tracklet_position, plot_kinematics, plot_bbox_params
 
-
+logger: logging.Logger = logging.getLogger("mf_analyser")
 class Tracklet:
     def __init__(self, df):
         self.df = df
@@ -46,13 +45,14 @@ class Tracklet:
 
     def save(self, path):
         os.makedirs(path, exist_ok=True)
-        tracklet_path = os.path.join(path, f'tracklet.tsv')
+        tracklet_path = os.path.join(path, f'tracklet_uid_{self.uid}.tsv')
         self.save_dataframe(tracklet_path)
         self.save_graphs(path)
 
     def save_graphs(self, path):
         plot_tracklet_position(self.lat_dist, self.long_dist, path)
         self._plot_kinematics(path)
+        self._plot_bbox_parameters(path)
 
     def _plot_kinematics(self, path):
         axis_dict = {'x_axis': {'lat_dist':  {'vector': self.lat_dist, 'units': 'm'},
@@ -69,6 +69,14 @@ class Tracklet:
         file_path = os.path.join(path, 'kinematics.png')
         plot_kinematics(x, axis_dict, file_path)
 
+    def _plot_bbox_parameters(self, path):
+        params_dict = {'world_width':{'vector': self.world_width, 'units':'m'},
+                       'world_height':{'vector': self.world_height, 'units':'m'}}
+        x = self.df['age'].to_numpy()
+        file_path = os.path.join(path, 'bbox_params.png')
+        plot_bbox_params(x, params_dict, file_path)
+
+
     def save_dataframe(self, path):
         self.df = self.df.drop(['index'], axis=1)
         self.df.to_csv(path, sep='\t', index=False)
@@ -82,5 +90,38 @@ class Tracklet:
         else:
             self.is_occluded = np.full(len(self.df), np.nan)
 
-    def get_attribute(self, attribute):
-        return np.diff(getattr(self, attribute))
+    def physical_anomaly(self):
+        if len(self.df) < 5:
+            return False
+        flag = False
+        if self.label == 0:
+            flag = self.world_height_anomaly()
+        if self.label == 2:
+            flag = self.longitudinal_velocity_sign_change()
+        return flag
+
+    def longitudinal_velocity_sign_change(self):
+        flag = False
+        idx = max(int(len(self.df) * 0.1), (self.df['age'] - 10).abs().idxmin())
+        for i in range(idx,len(self.abs_vel_z)-1):
+            curr_vel = self.abs_vel_z[i]
+            next_vel = self.abs_vel_z[i+1]
+            if self._sign_difference(curr_vel, next_vel) and abs(next_vel - curr_vel) > 1:
+                flag = True
+                logger.info(f'Longitudinal velocity anomaly at frame: {self.frames[i+1]} for label:{self.label} ; uid:{self.uid}')
+        return flag
+    def world_height_anomaly(self):
+        idx = int(len(self.df) * 0.1)
+        x = 2*np.std(self.world_height[idx:]) + np.mean(self.world_height[idx:])
+        flag = np.any(self.world_height[idx:] > min(x, 2.2))
+        if flag:
+            logger.info(f'Height anomaly for label:{self.label} ; uid:{self.uid}')
+        return flag
+
+    @staticmethod
+    def _sign_difference(x, y):
+        if (x < 0 and y >= 0) or (x >= 0 and y < 0):
+            return True
+        else:
+            return False
+
