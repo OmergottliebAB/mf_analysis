@@ -90,14 +90,32 @@ class Tracklet:
         else:
             self.is_occluded = np.full(len(self.df), np.nan)
 
+    def physical_anomaly(self):
+        if len(self.df) < 5:
+            return False
+        flag = False
+        if self.label == 0:
+            flag = self.world_height_anomaly()
+        if self.label == 2:
+            flag = self.longitudinal_velocity_sign_change()
+        return flag
+
     def longitudinal_velocity_sign_change(self):
         flag = False
-        for i in range(len(self.abs_vel_z)-1):
+        idx = max(int(len(self.df) * 0.1), (self.df['age'] - 10).abs().idxmin())
+        for i in range(idx,len(self.abs_vel_z)-1):
             curr_vel = self.abs_vel_z[i]
             next_vel = self.abs_vel_z[i+1]
             if self._sign_difference(curr_vel, next_vel) and abs(next_vel - curr_vel) > 1:
                 flag = True
-                logger.info(f'Longitudinal velocity sign change at {self.frames[i]}, label:{self.label} ; uid:{self.uid}')
+                logger.info(f'Longitudinal velocity anomaly at frame: {self.frames[i+1]} for label:{self.label} ; uid:{self.uid}')
+        return flag
+    def world_height_anomaly(self):
+        idx = int(len(self.df) * 0.1)
+        x = 2*np.std(self.world_height[idx:]) + np.mean(self.world_height[idx:])
+        flag = np.any(self.world_height[idx:] > min(x, 2.2))
+        if flag:
+            logger.info(f'Height anomaly for label:{self.label} ; uid:{self.uid}')
         return flag
 
     @staticmethod

@@ -76,13 +76,13 @@ class MFAnalyzer:
             os.makedirs(label_dir, exist_ok=True)
             tracklets = self.get_tracklets_by_label(label)
             for i, tracklet in enumerate(tracklets):
-                if tracklet.longitudinal_velocity_sign_change():
+                if tracklet.physical_anomaly():
                     tracklet_dir = os.path.join(label_dir, str(i))
                     tracklet.save(tracklet_dir)
 
 
 if __name__ == "__main__":
-    path = '/home/omer/B2B/multiframe/unsupervised_analysis/ultrasonic_texarkana_10_fps/cametra_interface_output.tsv'
+    path = '/home/omer/B2B/multiframe/unsupervised_analysis/stanch_las_cruces_10_fps__test/cametra_interface_output.tsv'
     mfa = MFAnalyzer(path)
-    mfa.save_tracklets()
+    mfa.save_physical_anomalies()
     print('')
