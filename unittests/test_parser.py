@@ -8,12 +8,12 @@ class TestParser(unittest.TestCase):
 
     def setUp(self):
         self.df = pd.read_csv(PATH, sep='\t')
-        self.num_frames = len(np.unique(self.df['name'].to_numpy()))
         self.tracklets = MFParser(self.df).apply()
 
     def test_tracklet_frames(self):
+        num_frames = len(np.unique(self.df['name'].to_numpy()))
         for tracklet in self.tracklets:
-            self.assertGreaterEqual(self.num_frames, len(tracklet.frames))
+            self.assertGreaterEqual(num_frames, len(tracklet.frames))
 
     def test_empty_tracklet(self):
         for tracklet in self.tracklets:
