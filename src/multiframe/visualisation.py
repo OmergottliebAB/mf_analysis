@@ -26,7 +26,6 @@ def plot_tracklet_position(x, z, path):
     plt.savefig(file_name)
     plt.close()
 
-
 def plot_kinematics(age, axis_dict: dict, file_path):
     axes = axis_dict.keys()
     N = len(axes)
@@ -51,8 +50,6 @@ def plot_bbox_params(age, params_dict: dict, file_path):
 
     plt.savefig(file_path)
     plt.close()
-
-
 
 def plot_variable(ax, x, y, title, units):
     N = len(x)
