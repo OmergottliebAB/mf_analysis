@@ -1,7 +1,7 @@
 import os
 import logging
 import numpy as np
-from visualisation import plot_tracklet_position, plot_kinematics, plot_bbox_params
+from src.multiframe.visualisation import plot_tracklet_position, plot_kinematics, plot_bbox_params
 
 logger: logging.Logger = logging.getLogger("mf_analyser")
 class Tracklet:
