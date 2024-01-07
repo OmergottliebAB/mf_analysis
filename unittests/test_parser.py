@@ -15,6 +15,11 @@ class TestParser(unittest.TestCase):
         for tracklet in self.tracklets:
             self.assertGreaterEqual(self.num_frames, tracklet.age)
 
+    def test_empty_tracklet(self):
+        for tracklet in self.tracklets:
+            self.assertLess(0, len(tracklet.df))
+
+
 
 
 if __name__ == '__main__':
