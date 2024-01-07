@@ -11,16 +11,21 @@ class TestParser(unittest.TestCase):
         self.num_frames = len(np.unique(self.df['name'].to_numpy()))
         self.tracklets = MFParser(self.df).apply()
 
-    def test_tracklet_age(self):
+    def test_tracklet_frames(self):
         for tracklet in self.tracklets:
-            self.assertGreaterEqual(self.num_frames, tracklet.age)
+            self.assertGreaterEqual(self.num_frames, len(tracklet.frames))
 
     def test_empty_tracklet(self):
         for tracklet in self.tracklets:
             self.assertLess(0, len(tracklet.df))
 
-
-
+    def test_duplicate_tracklets(self):
+        seen_objects = set()
+        for tracklet in self.tracklets:
+            if tracklet in seen_objects:
+                # Raise an AssertionError if the same object is found more than once
+                raise AssertionError(f"Duplicate object found")
+            seen_objects.add(tracklet)
 
 if __name__ == '__main__':
     unittest.main()
