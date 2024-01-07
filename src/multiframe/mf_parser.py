@@ -2,7 +2,7 @@ import tqdm
 import logging
 import numpy as np
 from itertools import chain
-from tracklet import Tracklet
+from src.multiframe.tracklet import Tracklet
 
 MF_LABELS = [0, 1, 2]
 
