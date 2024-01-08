@@ -9,10 +9,13 @@ MF_LABELS = [0, 1, 2]
 
 
 class MFAnalyzer:
-    def __init__(self, path):
+    def __init__(self, path, **kwargs):
         self.df = pd.read_csv(path, sep='\t')
         self.tracklets = MFParser(self.df).apply()
-        self.output_dir(path)
+        if 'output_dir' in kwargs.keys():
+            self.output_dir(kwargs['output_dir'])
+        else:
+            self.output_dir(os.path.dirname(path))
         self.set_logger()
 
     def __len__(self):
@@ -23,7 +26,6 @@ class MFAnalyzer:
         self.logger = setup_logger(path, name='mf_analyser')
 
     def output_dir(self, path):
-        path = os.path.dirname(path)
         self.output_dir = os.path.join(path, 'output')
         os.makedirs(self.output_dir, exist_ok=True)
 
