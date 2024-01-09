@@ -67,7 +67,10 @@ class MFAnalyzer:
             tracklets = self.get_tracklets_by_label(label)
             for i, tracklet in enumerate(tracklets):
                 tracklet_dir = os.path.join(label_dir, str(i))
-                tracklet.save(tracklet_dir)
+                os.makedirs(tracklet_dir, exist_ok=True)
+                tracklet_path = os.path.join(tracklet_dir, f'tracklet_uid_{tracklet.uid}.tsv')
+                tracklet.save_dataframe(tracklet_path)
+                tracklet.save_graphs(tracklet_dir)
 
     def save_physical_anomalies(self):
         self.logger.info('Anomaly detection according to unphysical changes')
@@ -80,7 +83,27 @@ class MFAnalyzer:
             for i, tracklet in enumerate(tracklets):
                 if tracklet.physical_anomaly():
                     tracklet_dir = os.path.join(label_dir, str(i))
-                    tracklet.save(tracklet_dir)
+                    os.makedirs(tracklet_dir, exist_ok=True)
+                    tracklet_path = os.path.join(tracklet_dir, f'tracklet_uid_{tracklet.uid}.tsv')
+                    tracklet.save_dataframe(tracklet_path)
+                    tracklet.save_graphs(tracklet_dir)
+    
+    def save_derivative_anomalies(self):
+        self.logger.info('Anomaly detection using derivatives')
+        tracklets_dir = os.path.join(self.output_dir, 'derivatives_anomalies')
+        os.makedirs(tracklets_dir, exist_ok=True)
+        for label in MF_LABELS:
+            label_dir = os.path.join(tracklets_dir, str(label))
+            os.makedirs(label_dir, exist_ok=True)
+            tracklets = self.get_tracklets_by_label(label)
+            for i, tracklet in enumerate(tracklets):
+                if tracklet.derivative_anomaly():
+                    tracklet_dir = os.path.join(label_dir, str(i))
+                    os.makedirs(tracklet_dir, exist_ok=True)
+                    tracklet_path = os.path.join(tracklet_dir, f'tracklet_uid_{tracklet.uid}.tsv')
+                    tracklet.save_dataframe(tracklet_path)
+                    tracklet.save_derivatives(tracklet_dir)
+                
 
 
 if __name__ == "__main__":

@@ -1,9 +1,11 @@
 import os
 import logging
 import numpy as np
-from src.multiframe.visualisation import plot_tracklet_position, plot_kinematics, plot_bbox_params
+from src.multiframe.smoothness import derivative_anomaly
+from src.multiframe.visualisation import plot_tracklet_position, plot_kinematics, plot_bbox_params, plot_derivatives
 
 logger: logging.Logger = logging.getLogger("mf_analyser")
+
 class Tracklet:
     def __init__(self, df):
         self.df = df
@@ -43,17 +45,10 @@ class Tracklet:
         self.sf_confirmed = self.df['sf_confirmed'].to_numpy()
         self.bbox_aspect_ratio()
 
-    def save(self, path):
-        os.makedirs(path, exist_ok=True)
-        tracklet_path = os.path.join(path, f'tracklet_uid_{self.uid}.tsv')
-        self.save_dataframe(tracklet_path)
-        self.save_graphs(path)
-
     def save_graphs(self, path):
         plot_tracklet_position(self.lat_dist, self.long_dist, path)
         self._plot_kinematics(path)
         self._plot_bbox_parameters(path)
-        self._plot_kinematics_second_derivatives(path)
 
     def _plot_kinematics(self, path):
         axis_dict = {'x_axis': {'lat_dist':  {'vector': self.lat_dist, 'units': 'm'},
@@ -76,18 +71,6 @@ class Tracklet:
         x = self.df['age'].to_numpy()
         file_path = os.path.join(path, 'bbox_params.png')
         plot_bbox_params(x, params_dict, file_path)
-
-    def _plot_kinematics_second_derivatives(self, path):
-        axis_dict = {'x_axis': {'lat_dist': {'vector': np.diff(self.lat_dist, n=2), 'units': 'm/s^2'},
-                                'abs_vel_x': {'vector': np.diff(self.abs_vel_x, n=2), 'units': ''},
-                                'abs_acc_x': {'vector': np.diff(self.abs_acc_x, n=2), 'units': ''}},
-                     'z_axis': {'long_dist': {'vector': np.diff(self.long_dist, n=2), 'units': 'm/s^2'},
-                                'abs_vel_z': {'vector': np.diff(self.abs_vel_z, n=2), 'units': 'm/s'},
-                                'abs_acc_z': {'vector': np.diff(self.abs_acc_z, n=2), 'units': 'm/s^2'}}}
-        x = self.df['age'][2:].to_numpy()
-        file_path = os.path.join(path, 'kinematics_second_derivative.png')
-        plot_kinematics(x, axis_dict, file_path)
-
 
     def save_dataframe(self, path):
         self.df = self.df.drop(['index'], axis=1)
@@ -122,6 +105,7 @@ class Tracklet:
                 flag = True
                 logger.info(f'Longitudinal velocity anomaly at frame: {self.frames[i+1]} for label:{self.label} ; uid:{self.uid}')
         return flag
+    
     def world_height_anomaly(self):
         idx = int(len(self.df) * 0.1)
         x = 2*np.std(self.world_height[idx:]) + np.mean(self.world_height[idx:])
@@ -136,4 +120,19 @@ class Tracklet:
             return True
         else:
             return False
+    
+    def derivative_anomaly(self):
+        for x in [self.lat_dist, self.long_dist, self.abs_vel_x, self.abs_vel_z]:
+            if derivative_anomaly(x):
+                return True
+        return False
+    
+    def save_derivatives(self, path):
+        os.makedirs(path, exist_ok=True)
+        vectors = {'lat_dist':self.lat_dist, 'long_dist':self.long_dist, 'lat_vel':self.abs_vel_x, 'longi_vel':self.abs_vel_z}
+        for key, value in vectors.items():
+            x = self.df['age'].to_numpy()
+            file_path = os.path.join(path, f'{key}_derivatives.png')
+            plot_derivatives(x, value, key, file_path)
+        
 
