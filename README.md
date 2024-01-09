@@ -2,4 +2,5 @@
 The following repository aims to pinpoint suspicious tracked objects without ground truth
 
 ### Pipeline
-![Screenshot from 2024-01-07 15-37-34](https://github.com/OmergottliebAB/mf_analysis/assets/88963449/8a503e3d-4bc1-4615-8fe7-9b1818f95216)
+![Screenshot from 2024-01-09 17-51-00](https://github.com/OmergottliebAB/mf_analysis/assets/88963449/905af7a7-14e9-4b08-8060-aed51d764bf1)
+
