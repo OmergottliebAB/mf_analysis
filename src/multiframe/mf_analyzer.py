@@ -72,7 +72,7 @@ class MFAnalyzer:
                 tracklet.save_dataframe(tracklet_path)
                 tracklet.save_graphs(tracklet_dir)
 
-    def save_physical_anomalies(self):
+    def save_tracklets_with_physical_anomalies(self):
         self.logger.info('Anomaly detection according to unphysical changes')
         tracklets_dir = os.path.join(self.output_dir, 'physical_anomalies')
         os.makedirs(tracklets_dir, exist_ok=True)
@@ -88,7 +88,7 @@ class MFAnalyzer:
                     tracklet.save_dataframe(tracklet_path)
                     tracklet.save_graphs(tracklet_dir)
     
-    def save_derivative_anomalies(self):
+    def save_tracklets_with_derivatives_anomalies(self):
         self.logger.info('Anomaly detection using derivatives')
         tracklets_dir = os.path.join(self.output_dir, 'derivatives_anomalies')
         os.makedirs(tracklets_dir, exist_ok=True)
@@ -97,7 +97,7 @@ class MFAnalyzer:
             os.makedirs(label_dir, exist_ok=True)
             tracklets = self.get_tracklets_by_label(label)
             for i, tracklet in enumerate(tracklets):
-                if tracklet.derivative_anomaly():
+                if tracklet.derivatives_anomaly():
                     tracklet_dir = os.path.join(label_dir, str(i))
                     os.makedirs(tracklet_dir, exist_ok=True)
                     tracklet_path = os.path.join(tracklet_dir, f'tracklet_uid_{tracklet.uid}.tsv')
@@ -107,7 +107,7 @@ class MFAnalyzer:
 
 
 if __name__ == "__main__":
-    path = '/home/omer/B2B/multiframe/unsupervised_analysis/stanch_las_cruces_10_fps__test/cametra_interface_output.tsv'
-    mfa = MFAnalyzer(path)
-    mfa.save_tracklets()
-    print('')
+    path = '/home/ubuntu/workspace/Omer/mf_analysis/stanch_las_cruces_10_fps__test/cametra_interface_output.tsv'
+    output_dir = '/home/omerg/workspace/mf_analysis/stanch_las_cruces_10_fps__test'
+    mfa = MFAnalyzer(path, output_dir=output_dir)
+    mfa.save_tracklets_with_derivatives_anomalies()

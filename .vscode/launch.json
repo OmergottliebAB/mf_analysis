@@ -1,0 +1,25 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "mf_analysis",
+            "type": "python",
+            "request": "launch",
+            "program": "src/multiframe/mf_analyzer.py",
+            "console": "integratedTerminal",
+            "python": "/usr/bin/python3",
+            "justMyCode": false,
+            "autoReload": {
+                "enable": true
+            },
+            "args": [],
+            "cwd": "/home/omerg/git/mf_analysis",
+            "env": {
+                "PYTHONPATH": "/home/omerg/git/mf_analysis:/home/omerg/git/mf_analysis/src:/home/omerg/git/mf_analysis/src/multiframe{env:PYTHONPATH}"
+            }
+        }
+    ]
+}

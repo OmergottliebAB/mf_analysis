@@ -64,7 +64,7 @@ def plot_variable(ax, x, y, title, units):
     ax.grid()
     ax.set_ylabel(f'[{units}]')
 
-def plot_derivatives(age, x, title, unit, file_path):
+def plot_derivatives(age, x, title, file_path):
     first_derivative = np.diff(x, n=1)
     avg1, std1 = np.mean(first_derivative), np.std(first_derivative)
     second_derivative = np.diff(x, n=2)
@@ -72,9 +72,8 @@ def plot_derivatives(age, x, title, unit, file_path):
     fig, ax = plt.subplots(3, 1, figsize=FIGSIZE)
     ax[0].plot(age, x, '--bo', label=f'{title}')
     ax[0].set_xlabel('age')
-    ax[0].set_ylabel(unit)
     ax[0].legend()
-    ax[0].grid()
+    ax[0].grid(which='both', axis='both')
     ax[0].set_xticks(age)
     
     ax[1].plot(age[1:], first_derivative, '--co', label='first derivative')
@@ -84,8 +83,8 @@ def plot_derivatives(age, x, title, unit, file_path):
     ax[1].plot(age[1:], np.full(len(age[1:]), 3*std1 + avg1), label=f'3*std',color='red', linestyle='dashdot')
     ax[1].plot(age[1:], np.full(len(age[1:]), -3*std1 + avg1), label=f'3*std',color='red', linestyle='dashdot')
     ax[1].set_xlabel('age')
-    ax[1].legend()
-    ax[1].grid()
+    ax[1].legend(loc='upper left', fontsize='xx-small')
+    ax[1].grid(which='both', axis='both')
     ax[1].set_xticks(age)
     
     ax[2].plot(age[2:], second_derivative, '--mo', label=f'second derivative')
@@ -95,8 +94,8 @@ def plot_derivatives(age, x, title, unit, file_path):
     ax[2].plot(age[2:], np.full(len(age[2:]), 3*std2 + avg2), label=f'3*std',color='red', linestyle='dashdot')
     ax[2].plot(age[2:], np.full(len(age[2:]), -3*std2 + avg2), label=f'3*std',color='red', linestyle='dashdot')
     ax[2].set_xlabel('age')
-    ax[2].legend()
-    ax[2].grid()
+    ax[2].legend(loc='upper left', fontsize='xx-small')
+    ax[2].grid(which='both', axis='both')
     ax[2].set_xticks(age)
     plt.tight_layout()
     plt.savefig(file_path)

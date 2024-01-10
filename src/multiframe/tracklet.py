@@ -1,10 +1,11 @@
 import os
 import logging
 import numpy as np
-from src.multiframe.smoothness import derivative_anomaly
+from src.multiframe.smoothness import second_derivative_anomaly
 from src.multiframe.visualisation import plot_tracklet_position, plot_kinematics, plot_bbox_params, plot_derivatives
 
 logger: logging.Logger = logging.getLogger("mf_analyser")
+
 
 class Tracklet:
     def __init__(self, df):
@@ -66,8 +67,8 @@ class Tracklet:
         plot_kinematics(x, axis_dict, file_path)
 
     def _plot_bbox_parameters(self, path):
-        params_dict = {'world_width':{'vector': self.world_width, 'units':'m'},
-                       'world_height':{'vector': self.world_height, 'units':'m'}}
+        params_dict = {'world_width': {'vector': self.world_width, 'units': 'm'},
+                       'world_height': {'vector': self.world_height, 'units': 'm'}}
         x = self.df['age'].to_numpy()
         file_path = os.path.join(path, 'bbox_params.png')
         plot_bbox_params(x, params_dict, file_path)
@@ -95,23 +96,37 @@ class Tracklet:
             flag = self.longitudinal_velocity_sign_change()
         return flag
 
+    def physical_anomaly_refactor(self):
+        check_functions = {
+            0: self.world_height_anomaly,
+            2: self.longitudinal_velocity_sign_change
+        }
+
+        check_func = check_functions.get(self.label)
+
+        return len(self.df) >= 5 and (check_func() if check_func else False)
+
     def longitudinal_velocity_sign_change(self):
         flag = False
-        idx = max(int(len(self.df) * 0.1), (self.df['age'] - 10).abs().idxmin())
-        for i in range(idx,len(self.abs_vel_z)-1):
+        idx = max(int(len(self.df) * 0.1),
+                  (self.df['age'] - 10).abs().idxmin())
+        for i in range(idx, len(self.abs_vel_z)-1):
             curr_vel = self.abs_vel_z[i]
             next_vel = self.abs_vel_z[i+1]
             if self._sign_difference(curr_vel, next_vel) and abs(next_vel - curr_vel) > 2:
                 flag = True
-                logger.info(f'Longitudinal velocity anomaly at frame: {self.frames[i+1]} for label:{self.label} ; uid:{self.uid}')
+                logger.info(
+                    f'Longitudinal velocity anomaly at frame: {self.frames[i+1]} for label:{self.label} ; uid:{self.uid}')
         return flag
-    
+
     def world_height_anomaly(self):
         idx = int(len(self.df) * 0.1)
-        x = 2*np.std(self.world_height[idx:]) + np.mean(self.world_height[idx:])
+        x = 2*np.std(self.world_height[idx:]) + \
+            np.mean(self.world_height[idx:])
         flag = np.any(self.world_height[idx:] > min(x, 2.2))
         if flag:
-            logger.info(f'Height anomaly for label:{self.label} ; uid:{self.uid}')
+            logger.info(
+                f'Height anomaly for label:{self.label} ; uid:{self.uid}')
         return flag
 
     @staticmethod
@@ -120,19 +135,25 @@ class Tracklet:
             return True
         else:
             return False
-    
-    def derivative_anomaly(self):
-        for x in [self.lat_dist, self.long_dist, self.abs_vel_x, self.abs_vel_z]:
-            if derivative_anomaly(x):
+
+    def derivatives_anomaly(self):
+        # Apply anomaly detection on object with enough history for Kalman filter to converge
+        if self.age < 10:
+            return False
+        vector_dict = {'lat_dist': self.lat_dist, 'long_dist': self.long_dist, 'lat_vel': self.abs_vel_x, 'longi_vel': self.abs_vel_z}
+        for key,x in vector_dict.items():
+            flag, indices = second_derivative_anomaly(x, self.df['age'].to_numpy())
+            if flag:
+                logger.info(
+                    f'Second derivative anomaly at {key} for label:{self.label} with uid:{self.uid} at frame:{self.frames[indices]}')
                 return True
         return False
-    
+
     def save_derivatives(self, path):
         os.makedirs(path, exist_ok=True)
-        vectors = {'lat_dist':self.lat_dist, 'long_dist':self.long_dist, 'lat_vel':self.abs_vel_x, 'longi_vel':self.abs_vel_z}
+        vectors = {'lat_dist': self.lat_dist, 'long_dist': self.long_dist,
+                   'lat_vel': self.abs_vel_x, 'longi_vel': self.abs_vel_z}
         for key, value in vectors.items():
             x = self.df['age'].to_numpy()
             file_path = os.path.join(path, f'{key}_derivatives.png')
             plot_derivatives(x, value, key, file_path)
-        
-
