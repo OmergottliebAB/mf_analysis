@@ -87,16 +87,6 @@ class Tracklet:
             self.is_occluded = np.full(len(self.df), np.nan)
 
     def physical_anomaly(self):
-        if len(self.df) < 5:
-            return False
-        flag = False
-        if self.label == 0:
-            flag = self.world_height_anomaly()
-        if self.label == 2:
-            flag = self.longitudinal_velocity_sign_change()
-        return flag
-
-    def physical_anomaly_refactor(self):
         check_functions = {
             0: self.world_height_anomaly,
             2: self.longitudinal_velocity_sign_change
@@ -141,13 +131,14 @@ class Tracklet:
         if self.age < 10:
             return False
         vector_dict = {'lat_dist': self.lat_dist, 'long_dist': self.long_dist, 'lat_vel': self.abs_vel_x, 'longi_vel': self.abs_vel_z}
+        flags = []
         for key,x in vector_dict.items():
             flag, indices = second_derivative_anomaly(x, self.df['age'].to_numpy())
+            flags.append(flag)
             if flag:
                 logger.info(
                     f'Second derivative anomaly at {key} for label:{self.label} with uid:{self.uid} at frame:{self.frames[indices]}')
-                return True
-        return False
+        return any(flags)
 
     def save_derivatives(self, path):
         os.makedirs(path, exist_ok=True)

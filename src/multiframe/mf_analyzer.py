@@ -110,4 +110,4 @@ if __name__ == "__main__":
     path = '/home/ubuntu/workspace/Omer/mf_analysis/stanch_las_cruces_10_fps__test/cametra_interface_output.tsv'
     output_dir = '/home/omerg/workspace/mf_analysis/stanch_las_cruces_10_fps__test'
     mfa = MFAnalyzer(path, output_dir=output_dir)
-    mfa.save_tracklets_with_derivatives_anomalies()
+    mfa.save_tracklets_with_physical_anomalies()
