@@ -2,7 +2,7 @@ import os
 import tqdm
 import numpy as np
 import pandas as pd
-from mf_parser import MFParser
+from src.multiframe.mf_parser import MFParser
 from src.utils import setup_logger
 
 MF_LABELS = [0, 1, 2]
@@ -80,7 +80,7 @@ class MFAnalyzer:
             label_dir = os.path.join(tracklets_dir, str(label))
             os.makedirs(label_dir, exist_ok=True)
             tracklets = self.get_tracklets_by_label(label)
-            for i, tracklet in enumerate(tracklets):
+            for i, tracklet in tqdm.tqdm(enumerate(tracklets)):
                 if tracklet.physical_anomaly():
                     tracklet_dir = os.path.join(label_dir, str(i))
                     os.makedirs(tracklet_dir, exist_ok=True)
@@ -96,18 +96,11 @@ class MFAnalyzer:
             label_dir = os.path.join(tracklets_dir, str(label))
             os.makedirs(label_dir, exist_ok=True)
             tracklets = self.get_tracklets_by_label(label)
-            for i, tracklet in enumerate(tracklets):
+            for i, tracklet in tqdm.tqdm(enumerate(tracklets)):
                 if tracklet.derivatives_anomaly():
                     tracklet_dir = os.path.join(label_dir, str(i))
                     os.makedirs(tracklet_dir, exist_ok=True)
                     tracklet_path = os.path.join(tracklet_dir, f'tracklet_uid_{tracklet.uid}.tsv')
                     tracklet.save_dataframe(tracklet_path)
                     tracklet.save_derivatives(tracklet_dir)
-                
 
-
-if __name__ == "__main__":
-    path = '/home/ubuntu/workspace/Omer/mf_analysis/stanch_las_cruces_10_fps__test/cametra_interface_output.tsv'
-    output_dir = '/home/omerg/workspace/mf_analysis/stanch_las_cruces_10_fps__test'
-    mfa = MFAnalyzer(path, output_dir=output_dir)
-    mfa.save_tracklets_with_physical_anomalies()

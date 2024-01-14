@@ -74,7 +74,8 @@ class Tracklet:
         plot_bbox_params(x, params_dict, file_path)
 
     def save_dataframe(self, path):
-        self.df = self.df.drop(['index'], axis=1)
+        if 'index' in self.df.columns:
+            self.df = self.df.drop(['index'], axis=1)
         self.df.to_csv(path, sep='\t', index=False)
 
     def bbox_aspect_ratio(self):
