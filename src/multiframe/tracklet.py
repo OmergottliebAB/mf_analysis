@@ -128,6 +128,8 @@ class Tracklet:
             return False
 
     def derivatives_anomaly(self):
+        # TODO: test axis cross correlation
+        # TODO: test second derivative auto correlation
         # Apply anomaly detection on object with enough history for Kalman filter to converge
         if self.age < 10:
             return False
