@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "mf_analysis",
+            "type": "python",
+            "request": "launch",
+            "program": "main.py",
+            "console": "integratedTerminal",
+            "python": "/usr/bin/python3",
+            "justMyCode": false,
+            "autoReload": {
+                "enable": true
+            },
+            "args": ["--cametra_path",
+            "/home/ubuntu/workspace/Omer/mf_analysis/courageous_panama_city_10_fps/cametra_interface_output.tsv",
+            "--output_dir",
+            "/home/omerg/workspace/mf_analysis/courageous_panama_city_10_fps"],
+            "cwd": "/home/omerg/git/mf_analysis",
+            "env": {
+                "PYTHONPATH": "/home/omerg/git/mf_analysis:/home/omerg/git/mf_analysis/src:/home/omerg/git/mf_analysis/src/multiframe{env:PYTHONPATH}"
+            }
+        }
+    ]
+}

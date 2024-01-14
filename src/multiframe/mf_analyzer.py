@@ -2,17 +2,20 @@ import os
 import tqdm
 import numpy as np
 import pandas as pd
-from mf_parser import MFParser
+from src.multiframe.mf_parser import MFParser
 from src.utils import setup_logger
 
 MF_LABELS = [0, 1, 2]
 
 
 class MFAnalyzer:
-    def __init__(self, path):
+    def __init__(self, path, **kwargs):
         self.df = pd.read_csv(path, sep='\t')
         self.tracklets = MFParser(self.df).apply()
-        self.output_dir(path)
+        if 'output_dir' in kwargs.keys():
+            self.output_dir(kwargs['output_dir'])
+        else:
+            self.output_dir(os.path.dirname(path))
         self.set_logger()
 
     def __len__(self):
@@ -23,7 +26,6 @@ class MFAnalyzer:
         self.logger = setup_logger(path, name='mf_analyser')
 
     def output_dir(self, path):
-        path = os.path.dirname(path)
         self.output_dir = os.path.join(path, 'output')
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -65,9 +67,12 @@ class MFAnalyzer:
             tracklets = self.get_tracklets_by_label(label)
             for i, tracklet in enumerate(tracklets):
                 tracklet_dir = os.path.join(label_dir, str(i))
-                tracklet.save(tracklet_dir)
+                os.makedirs(tracklet_dir, exist_ok=True)
+                tracklet_path = os.path.join(tracklet_dir, f'tracklet_uid_{tracklet.uid}.tsv')
+                tracklet.save_dataframe(tracklet_path)
+                tracklet.save_graphs(tracklet_dir)
 
-    def save_physical_anomalies(self):
+    def save_tracklets_with_physical_anomalies(self):
         self.logger.info('Anomaly detection according to unphysical changes')
         tracklets_dir = os.path.join(self.output_dir, 'physical_anomalies')
         os.makedirs(tracklets_dir, exist_ok=True)
@@ -75,14 +80,27 @@ class MFAnalyzer:
             label_dir = os.path.join(tracklets_dir, str(label))
             os.makedirs(label_dir, exist_ok=True)
             tracklets = self.get_tracklets_by_label(label)
-            for i, tracklet in enumerate(tracklets):
+            for i, tracklet in tqdm.tqdm(enumerate(tracklets)):
                 if tracklet.physical_anomaly():
                     tracklet_dir = os.path.join(label_dir, str(i))
-                    tracklet.save(tracklet_dir)
+                    os.makedirs(tracklet_dir, exist_ok=True)
+                    tracklet_path = os.path.join(tracklet_dir, f'tracklet_uid_{tracklet.uid}.tsv')
+                    tracklet.save_dataframe(tracklet_path)
+                    tracklet.save_graphs(tracklet_dir)
+    
+    def save_tracklets_with_derivatives_anomalies(self):
+        self.logger.info('Anomaly detection using derivatives')
+        tracklets_dir = os.path.join(self.output_dir, 'derivatives_anomalies')
+        os.makedirs(tracklets_dir, exist_ok=True)
+        for label in MF_LABELS:
+            label_dir = os.path.join(tracklets_dir, str(label))
+            os.makedirs(label_dir, exist_ok=True)
+            tracklets = self.get_tracklets_by_label(label)
+            for i, tracklet in tqdm.tqdm(enumerate(tracklets)):
+                if tracklet.derivatives_anomaly():
+                    tracklet_dir = os.path.join(label_dir, str(i))
+                    os.makedirs(tracklet_dir, exist_ok=True)
+                    tracklet_path = os.path.join(tracklet_dir, f'tracklet_uid_{tracklet.uid}.tsv')
+                    tracklet.save_dataframe(tracklet_path)
+                    tracklet.save_derivatives(tracklet_dir)
 
-
-if __name__ == "__main__":
-    path = '/home/omer/B2B/multiframe/unsupervised_analysis/ultrasonic_texarkana_10_fps/cametra_interface_output.tsv'
-    mfa = MFAnalyzer(path)
-    mfa.save_physical_anomalies()
-    print('')

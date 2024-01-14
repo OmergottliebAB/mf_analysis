@@ -26,7 +26,6 @@ def plot_tracklet_position(x, z, path):
     plt.savefig(file_name)
     plt.close()
 
-
 def plot_kinematics(age, axis_dict: dict, file_path):
     axes = axis_dict.keys()
     N = len(axes)
@@ -52,8 +51,6 @@ def plot_bbox_params(age, params_dict: dict, file_path):
     plt.savefig(file_path)
     plt.close()
 
-
-
 def plot_variable(ax, x, y, title, units):
     N = len(x)
     mean, std = np.mean(y), np.std(y)
@@ -66,3 +63,40 @@ def plot_variable(ax, x, y, title, units):
     ax.legend()
     ax.grid()
     ax.set_ylabel(f'[{units}]')
+
+def plot_derivatives(age, x, title, file_path):
+    first_derivative = np.diff(x, n=1)
+    avg1, std1 = np.mean(first_derivative), np.std(first_derivative)
+    second_derivative = np.diff(x, n=2)
+    avg2, std2 = np.mean(second_derivative), np.std(second_derivative)
+    fig, ax = plt.subplots(3, 1, figsize=FIGSIZE)
+    ax[0].plot(age, x, '--bo', label=f'{title}')
+    ax[0].set_xlabel('age')
+    ax[0].legend()
+    ax[0].grid(which='both', axis='both')
+    ax[0].set_xticks(age)
+    
+    ax[1].plot(age[1:], first_derivative, '--co', label='first derivative')
+    ax[1].plot(age[1:], np.full(len(age[1:]), avg1), label='mean', color='green')
+    ax[1].plot(age[1:], np.full(len(age[1:]), 2*std1 + avg1), label=f'2*std',color='red', linestyle='dashed')
+    ax[1].plot(age[1:], np.full(len(age[1:]), -2*std1 + avg1), label=f'2*std',color='red', linestyle='dashed')
+    ax[1].plot(age[1:], np.full(len(age[1:]), 3*std1 + avg1), label=f'3*std',color='red', linestyle='dashdot')
+    ax[1].plot(age[1:], np.full(len(age[1:]), -3*std1 + avg1), label=f'3*std',color='red', linestyle='dashdot')
+    ax[1].set_xlabel('age')
+    ax[1].legend(loc='upper left', fontsize='xx-small')
+    ax[1].grid(which='both', axis='both')
+    ax[1].set_xticks(age)
+    
+    ax[2].plot(age[2:], second_derivative, '--mo', label=f'second derivative')
+    ax[2].plot(age[2:], np.full(len(age[2:]), avg2), label='mean', color='green')
+    ax[2].plot(age[2:], np.full(len(age[2:]), 2*std2 + avg2), label=f'2*std',color='red', linestyle='dashed')
+    ax[2].plot(age[2:], np.full(len(age[2:]), -2*std2 + avg2), label=f'2*std',color='red', linestyle='dashed')
+    ax[2].plot(age[2:], np.full(len(age[2:]), 3*std2 + avg2), label=f'3*std',color='red', linestyle='dashdot')
+    ax[2].plot(age[2:], np.full(len(age[2:]), -3*std2 + avg2), label=f'3*std',color='red', linestyle='dashdot')
+    ax[2].set_xlabel('age')
+    ax[2].legend(loc='upper left', fontsize='xx-small')
+    ax[2].grid(which='both', axis='both')
+    ax[2].set_xticks(age)
+    plt.tight_layout()
+    plt.savefig(file_path)
+    plt.close()
