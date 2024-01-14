@@ -88,6 +88,7 @@ class Tracklet:
             self.is_occluded = np.full(len(self.df), np.nan)
 
     def physical_anomaly(self):
+        # TODO: consider truncation boxes
         check_functions = {
             0: self.world_height_anomaly,
             2: self.longitudinal_velocity_sign_change
@@ -130,6 +131,7 @@ class Tracklet:
     def derivatives_anomaly(self):
         # TODO: test axis cross correlation
         # TODO: test second derivative auto correlation
+        # TODO: consider truncation boxes
         # Apply anomaly detection on object with enough history for Kalman filter to converge
         if self.age < 10:
             return False
