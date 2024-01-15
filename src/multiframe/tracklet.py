@@ -136,20 +136,20 @@ class Tracklet:
         if self.age < 10:
             return False
         vector_dict = {'lat_dist': self.lat_dist, 'long_dist': self.long_dist, 'lat_vel': self.abs_vel_x, 'longi_vel': self.abs_vel_z}
+        self.vectors_for_plot = {}
         flags = []
         for key,x in vector_dict.items():
             flag, indices = second_derivative_anomaly(x, self.df['age'].to_numpy())
             flags.append(flag)
             if flag:
+                self.vectors_for_plot[key] = x
                 logger.info(
                     f'Second derivative anomaly at {key} for label:{self.label} with uid:{self.uid} at frame:{self.frames[indices]}')
         return any(flags)
 
     def save_derivatives(self, path):
         os.makedirs(path, exist_ok=True)
-        vectors = {'lat_dist': self.lat_dist, 'long_dist': self.long_dist,
-                   'lat_vel': self.abs_vel_x, 'longi_vel': self.abs_vel_z}
-        for key, value in vectors.items():
+        for key, value in self.vectors_for_plot.items():
             x = self.df['age'].to_numpy()
             file_path = os.path.join(path, f'{key}_derivatives.png')
             plot_derivatives(x, value, key, file_path)

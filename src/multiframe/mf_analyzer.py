@@ -11,6 +11,7 @@ MF_LABELS = [0, 1, 2]
 class MFAnalyzer:
     def __init__(self, path, **kwargs):
         self.df = pd.read_csv(path, sep='\t')
+        # TODO: add truncation column to OD cametra dataframe
         self.tracklets = MFParser(self.df).apply()
         if 'output_dir' in kwargs.keys():
             self.output_dir(kwargs['output_dir'])
