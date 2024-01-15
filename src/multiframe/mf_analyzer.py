@@ -116,7 +116,7 @@ class MFAnalyzer:
                 tracklet_path = os.path.join(tracklet_dir, f'tracklet_uid_{tracklet.uid}.tsv')
                 tracklet.save_dataframe(tracklet_path)
                 tracklet.save_derivatives(tracklet_dir)
-                tracklet.save_graphs(tracklet_dir)
+                tracklet._plot_kinematics(tracklet_dir)
     
     def get_cipv_tracklets(self):
         tracklets = []
