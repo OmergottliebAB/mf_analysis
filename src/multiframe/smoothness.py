@@ -9,7 +9,7 @@ def second_derivative_anomaly(x, age):
     def anomaly(value, avg, std, age, index):
         three_std_cond = (value > avg+3*std) or (value < avg-3*std)
         age_cond = age[index] >= 10 and age[index] < age[-1]
-        unconfirmed_cond = age[index]-age[index-1] == 1
+        unconfirmed_cond = age[index]-age[index-2] == 2
         return three_std_cond and age_cond and unconfirmed_cond
     
     second_derivative = np.diff(x, n=2)
