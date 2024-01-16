@@ -18,7 +18,7 @@
             "args": ["--cametra_path",
             "/home/ubuntu/workspace/Omer/mf_analysis/ultrasonic_texarkana_10_fps/cametra_interface_output.tsv",
             "--output_dir",
-            "/home/omerg/workspace/mf_analysis/ultrasonic_texarkana_10_fps/derivative_v2"],
+            "/home/omerg/workspace/mf_analysis/ultrasonic_texarkana_10_fps/version2"],
             "cwd": "/home/omerg/git/mf_analysis",
             "env": {
                 "PYTHONPATH": "/home/omerg/git/mf_analysis:/home/omerg/git/mf_analysis/src:/home/omerg/git/mf_analysis/src/multiframe{env:PYTHONPATH}"
