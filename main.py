@@ -13,6 +13,7 @@ def run(args):
     mfa = MFAnalyzer(args.cametra_path, output_dir=args.output_dir)
     mfa.save_tracklets_with_physical_anomalies()
     mfa.save_tracklets_with_derivatives_anomalies()
+    mfa.analyze_cipv()
     
 
 if __name__ == "__main__":

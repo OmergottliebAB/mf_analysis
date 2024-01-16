@@ -11,6 +11,7 @@ MF_LABELS = [0, 1, 2]
 class MFAnalyzer:
     def __init__(self, path, **kwargs):
         self.df = pd.read_csv(path, sep='\t')
+        # TODO: add truncation column to OD cametra dataframe
         self.tracklets = MFParser(self.df).apply()
         if 'output_dir' in kwargs.keys():
             self.output_dir(kwargs['output_dir'])
@@ -103,4 +104,24 @@ class MFAnalyzer:
                     tracklet_path = os.path.join(tracklet_dir, f'tracklet_uid_{tracklet.uid}.tsv')
                     tracklet.save_dataframe(tracklet_path)
                     tracklet.save_derivatives(tracklet_dir)
+    
+    def analyze_cipv(self):
+        self.logger.info('Anomaly detection on CIPV objects')
+        tracklets_dir = os.path.join(self.output_dir, 'cipv_analysis')
+        tracklets = self.get_cipv_tracklets()
+        for i, tracklet in tqdm.tqdm(enumerate(tracklets)):
+            if tracklet.derivatives_anomaly() or tracklet.physical_anomaly():
+                tracklet_dir = os.path.join(tracklets_dir, str(i))
+                os.makedirs(tracklet_dir, exist_ok=True)
+                tracklet_path = os.path.join(tracklet_dir, f'tracklet_uid_{tracklet.uid}.tsv')
+                tracklet.save_dataframe(tracklet_path)
+                tracklet.save_derivatives(tracklet_dir)
+                tracklet._plot_kinematics(tracklet_dir)
+    
+    def get_cipv_tracklets(self):
+        tracklets = []
+        for tracklet in self.tracklets:
+            if tracklet.label == 2 and 1 in tracklet.is_cipv:
+                tracklets.append(tracklet)
+        return tracklets
 
